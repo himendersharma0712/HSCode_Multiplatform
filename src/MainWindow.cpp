@@ -69,7 +69,8 @@ void MainWindow::OnOpen(wxCommandEvent& event){
     // display file open dialog
     // search for cpp files
 
-    wxFileDialog dlg(this, "Open File", "","","C++ files (*.cpp;*.h)|All files (*.*)|*.*",wxFD_OPEN);
+    wxFileDialog dlg(this, "Open File", "", "", "C++ source files (*.cpp)|*.cpp|Header files (*.h)|*.h|All files (*.*)|*.*", wxFD_OPEN);
+
 
     // if cancel button is clicked
     if(dlg.ShowModal() == wxID_CANCEL)
@@ -99,7 +100,7 @@ void MainWindow::OnOpen(wxCommandEvent& event){
 void MainWindow::OnSave(wxCommandEvent& event){
 
     // show save-file ? dialog
-    wxFileDialog dlg(this, "Save File", "", "", "C++ files (*.cpp;*.h)|*.cpp;*.h|All files (*.*)|*.*", wxFD_SAVE| wxFD_OVERWRITE_PROMPT);
+    wxFileDialog dlg(this, "Save File", "", "", "C++ source files (*.cpp)|*.cpp|Header files (*.h)|*.h|All files (*.*)|*.*", wxFD_SAVE| wxFD_OVERWRITE_PROMPT);
 
 
     // if cancel button clicked
