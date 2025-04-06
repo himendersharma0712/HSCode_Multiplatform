@@ -3,6 +3,7 @@
 
 #include <wx/wx.h>
 #include <wx/stc/stc.h> // styled text control
+#include <wx/aui/aui.h> // AUI(Advanced User Interface) for notebook tabs
 
 class MainWindow : public wxFrame
 {
@@ -13,13 +14,32 @@ class MainWindow : public wxFrame
 
     private:
 
+    // Pointer to a tabbed notebook (each tab will have an editor)
+    wxAuiNotebook * notebook;
+
+
+    // UI Functions---->
+
+    // creates the menu bar and items
+    void CreateMenuBar();
+
+    // creates the status bar at the bottom and notebook
+    void CreateStatusBarAndNotebook();
+
+    // creates a new tab
+    void AddNewTab(const wxString& title = "Untitled");
+
+    wxStyledTextCtrl * GetCurrentEditor();  // Returns editor in current tab
+
+
     // some functions like open, save, exit and "Build and Run"
+
     void OnOpen(wxCommandEvent & event);
     void OnSave(wxCommandEvent & event);
     void OnExit(wxCommandEvent & event);
     void OnBuildAndRun(wxCommandEvent & event);
 
-    wxStyledTextCtrl * editor;  // typing area for text
+    
 
 
 };

@@ -3,6 +3,7 @@
 #include <wx/msgdlg.h> // ?
 #include <fstream> // for reading and writing files 
 #include <string>
+#include <sstream>
 
 // unique ids for menu items 
 enum {
@@ -17,8 +18,27 @@ MainWindow::MainWindow(const wxString& title)
     :wxFrame(nullptr,wxID_ANY,title,wxDefaultPosition,wxSize(1400,900))
 {
 
+     CreateMenuBar(); // initializes menu bar
+     CreateStatusBarAndNotebook(); // setup notebook(tabs) and status bar
+     AddNewTab();  // start with one blank tab
 
-    // --- MENU BAR --- >
+
+     SetStatusText("Welcome to HSCode!");
+
+
+     // dynamically connecting meny items to respective handlers
+     Connect(ID_Open,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(MainWindow::OnOpen));
+     Connect(ID_Save,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(MainWindow::OnSave));
+     Connect(wxID_EXIT,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(MainWindow::OnExit));
+     Connect(ID_BuildRun,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(MainWindow::OnBuildAndRun));
+
+
+}
+
+
+void MainWindow::CreateMenuBar(){
+
+     // --- MENU BAR --- >
 
     // menubar holds menus
     // menus hold menu items 
@@ -38,29 +58,44 @@ MainWindow::MainWindow(const wxString& title)
     // Add File menu to MenuBar
     menuBar->Append(fileMenu,"&File");
     SetMenuBar(menuBar);
+}
 
 
-    // TEXT SPACE FOR WRITING CODE ----->
 
-    // creating a style text control (styled as in can support highlighting n stuff)
-    editor = new wxStyledTextCtrl(this,wxID_ANY,wxDefaultPosition,wxDefaultSize,wxTE_MULTILINE|wxTE_RICH2|wxHSCROLL);
+void MainWindow::CreateStatusBarAndNotebook(){
+    // creates stock status bar 
+    CreateStatusBar(); 
+
+    // notebook with close button 
+
+    notebook = new wxAuiNotebook(this,wxID_ANY,wxDefaultPosition,wxDefaultSize,
+        wxAUI_NB_DEFAULT_STYLE | wxAUI_NB_CLOSE_ON_ALL_TABS);
+}
 
 
-    // Create status bar at the bottom of the window
-    CreateStatusBar();
-    SetStatusText("Welcome To Harland's IDE");
+void MainWindow::AddNewTab(const wxString& title){
 
-    // Dynamic Event Binding
+    // create a new styled text control for code editing
 
-    // Binding menu items to handler methods
-    // to handle wt to do when a button is clicked
+    auto * editor = new wxStyledTextCtrl(notebook,wxID_ANY);
 
-    // we provide pointers to the functions(references)
-    Bind(wxEVT_MENU,&MainWindow::OnOpen,this, ID_Open);
-    Bind(wxEVT_MENU,&MainWindow::OnSave,this, ID_Save);
-    Bind(wxEVT_MENU,&MainWindow::OnBuildAndRun,this, ID_BuildRun);
-    Bind(wxEVT_MENU,&MainWindow::OnExit, this, wxID_EXIT);
+    // Add it to the notebook with given title
+    notebook->AddPage(editor,title,true);
+}
 
+
+wxStyledTextCtrl * MainWindow::GetCurrentEditor(){
+
+    // a notebook contains pages aka tabs or panels 
+    // a page is a panel or a tab 
+    // get current tab index
+    
+    int pageIndex = notebook->GetSelection();
+
+    if(pageIndex == wxNOT_FOUND) return nullptr;
+
+    // Return editor widget in the selected tab
+    return dynamic_cast<wxStyledTextCtrl*>(notebook->GetPage(pageIndex));
 }
 
 
@@ -84,37 +119,42 @@ void MainWindow::OnOpen(wxCommandEvent& event){
 
     // opening a file in input file stream-> to read from file
     std::ifstream file(dlg.GetPath().ToStdString());
+    std::stringstream buffer; // make a buffer
+    buffer << file.rdbuf(); // fill the buffer with file's content
 
-    if(file)
-    {
-        // Template class istreambuf_iterator
-        // Provides input iterator semantics for streambuf
-        std::string content ((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 
-        // Write the content read from file to the text area 
-        editor->SetText(content);
-    }
+    // create new tab with file name as title and set its text
+    AddNewTab(dlg.GetFilename());
+    GetCurrentEditor()->SetText(buffer.str());
 }
 
 
 void MainWindow::OnSave(wxCommandEvent& event){
 
     // show save-file ? dialog
-    wxFileDialog dlg(this, "Save File", "", "", "C++ source files (*.cpp)|*.cpp|Header files (*.h)|*.h|All files (*.*)|*.*", wxFD_SAVE| wxFD_OVERWRITE_PROMPT);
+    wxFileDialog dlg(this, "Save File", "", "", "C++ source files (*.cpp)|*.cpp|Header files (*.h)|*.h|All files (*.*)|*.*", 
+        wxFD_SAVE| wxFD_OVERWRITE_PROMPT);
 
 
     // if cancel button clicked
     if(dlg.ShowModal() == wxID_CANCEL)
         return; // then fun is terminated
+
+    
+    // Get text from the current editor
+
+    auto * editor = GetCurrentEditor();
+    if(!editor) return; // if invalid editor then return
     
     // write contents to a new file
     std::ofstream file(dlg.GetPath().ToStdString());
+    file << editor->GetText().ToStdString();
+
+
+    // Update the tab title with saved file name
+
+    notebook->SetPageText(notebook->GetSelection(),dlg.GetFilename());
     
-    // if file is valid then lets write it
-    if(file)
-    {
-        file << editor->GetText().ToStdString(); // writing to the file
-    }
 
 
 }
@@ -132,6 +172,6 @@ void MainWindow::OnBuildAndRun(wxCommandEvent& event){
     // message box
 
     wxMessageBox("Build and Run under development! :)", 
-        "Stay Updated!", 
+        "Notice", 
         wxOK|wxICON_INFORMATION);
 }
