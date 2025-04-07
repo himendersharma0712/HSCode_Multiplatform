@@ -101,6 +101,10 @@ void MainWindow::AddNewTab(const wxString& title){
 
     auto * editor = new wxStyledTextCtrl(notebook,wxID_ANY);
 
+    // set margins to zero
+    editor->SetMargins(0,0);
+    editor->SetMarginWidth(0,0);
+
 
     // background color 
     editor->StyleSetBackground(wxSTC_STYLE_DEFAULT, wxColour(30, 30, 30));   // Dark gray background

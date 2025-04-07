@@ -21,5 +21,6 @@ x86_64-w64-mingw32-g++ \
   -lwx_baseu_net-3.2-x86_64-w64-mingw32 \
   -lwx_mswu_webview-3.2-x86_64-w64-mingw32 \
   -lwx_mswu_media-3.2-x86_64-w64-mingw32 \
+  -mwindows \
   -o HSCode.exe
 
