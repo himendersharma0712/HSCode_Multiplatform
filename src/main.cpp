@@ -5,7 +5,7 @@ IMPLEMENT_APP(MyIDE)
 
 bool MyIDE::OnInit()
 {
-    MainWindow * mainWin = new MainWindow("IDE prototype");
+    MainWindow * mainWin = new MainWindow("HSCode");
     mainWin->Show(true);
 
     return true;

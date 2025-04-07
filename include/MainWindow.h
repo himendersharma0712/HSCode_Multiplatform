@@ -39,6 +39,13 @@ class MainWindow : public wxFrame
     void OnExit(wxCommandEvent & event);
     void OnBuildAndRun(wxCommandEvent & event);
 
+    // view menu function declarations
+    void OnThemeLight(wxCommandEvent& event);
+    void OnThemeDark(wxCommandEvent& event);
+
+    // apply theme
+    void ApplyTheme(bool darkMode);
+
     
 
 
