@@ -1,8 +1,8 @@
 # OOPS_Project
-a GUI program built using wxWidgets 
-//----------------------------------//
+*a GUI program built using wxWidgets*
 
-HSCode IDE - Version 1.0.3 (WIP)
+
+# HSCode IDE - Version 1.0.3 (WIP)
 
 Core Features Implemented:
 
