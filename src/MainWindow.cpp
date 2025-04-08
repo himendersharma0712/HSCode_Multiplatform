@@ -105,12 +105,14 @@ void MainWindow::AddNewTab(const wxString& title){
     // set margins to zero
     editor->SetMargins(0,0);
 
-    // set all margins to zero
-    editor->SetMarginWidth(0,0);
+    // set all margins to zero except 0th
     editor->SetMarginWidth(1,0);
     editor->SetMarginWidth(2,0);
     editor->SetMarginWidth(3,0);
     editor->SetMarginWidth(4,0);
+
+    // AA enabled for windows
+    editor->SetUseAntiAliasing(true);
 
 
     // background color 
@@ -153,6 +155,17 @@ void MainWindow::AddNewTab(const wxString& title){
     editor->StyleSetBold(wxSTC_C_WORD,true); // set bold font for set 1
 
 
+    // Left margin line numbers 
+    editor->SetMarginType(0,wxSTC_MARGIN_NUMBER);
+    editor->SetMarginWidth(0,40);
+
+    editor->StyleSetForeground(wxSTC_STYLE_LINENUMBER,wxColour(128,128,128));
+    editor->StyleSetBackground(wxSTC_STYLE_LINENUMBER,wxColour(30,30,30));
+
+
+    // setting caret (cursor) color 
+    editor->SetCaretForeground(wxColour(255,255,255));
+    editor->SetCaretWidth(2);
 
     // styling operators 
     editor->StyleSetForeground(wxSTC_C_OPERATOR,wxColour(255,140,0));
