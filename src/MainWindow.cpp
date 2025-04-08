@@ -92,6 +92,8 @@ void MainWindow::CreateStatusBarAndNotebook(){
 
     notebook = new wxAuiNotebook(this,wxID_ANY,wxDefaultPosition,wxDefaultSize,
         wxAUI_NB_DEFAULT_STYLE | wxAUI_NB_CLOSE_ON_ALL_TABS);
+
+    notebook->SetBackgroundColour(wxColour(30,30,30));
     
 }
 
@@ -100,10 +102,10 @@ void MainWindow::AddNewTab(const wxString& title){
 
     // create a new styled text control for code editing
 
-    auto * editor = new wxStyledTextCtrl(notebook,wxID_ANY);
+    auto * editor = new wxStyledTextCtrl(notebook,wxID_ANY,wxDefaultPosition,wxDefaultSize,wxBORDER_NONE);
 
     // set margins to zero
-    editor->SetMargins(0,0);
+    editor->SetMargins(5,0);
 
     // set all margins to zero except 0th
     editor->SetMarginWidth(1,0);
@@ -162,6 +164,8 @@ void MainWindow::AddNewTab(const wxString& title){
     editor->StyleSetForeground(wxSTC_STYLE_LINENUMBER,wxColour(128,128,128));
     editor->StyleSetBackground(wxSTC_STYLE_LINENUMBER,wxColour(30,30,30));
 
+    // set background color for notebook 
+    editor->GetParent()->SetBackgroundColour(wxColour(30,30,30));
 
     // setting caret (cursor) color 
     editor->SetCaretForeground(wxColour(255,255,255));
@@ -170,9 +174,6 @@ void MainWindow::AddNewTab(const wxString& title){
     // styling operators 
     editor->StyleSetForeground(wxSTC_C_OPERATOR,wxColour(255,140,0));
     editor->StyleSetBold(wxSTC_C_OPERATOR,true);
-
-
-    
 
     // preprocessors highlighting
     editor->StyleSetForeground(wxSTC_C_PREPROCESSOR,wxColour(128,0,128)); // purple
@@ -269,46 +270,126 @@ void MainWindow::OnExit(wxCommandEvent& event){
 
 void MainWindow::OnBuildAndRun(wxCommandEvent& event){
 
-    // message box
+    // get current editor from notebook 
+    wxStyledTextCtrl * editor = dynamic_cast<wxStyledTextCtrl*>(notebook->GetPage(notebook->GetSelection()));
+    if(!editor)
+    {
+        wxMessageBox("No active editor found!", "Fatal error",wxICON_ERROR);
+        return;
+    }
 
-    wxMessageBox("Build and Run under development! :)", 
-        "Notice", 
-        wxOK|wxICON_INFORMATION);
+    // get the code from editor
+    wxString code = editor->GetText();
+
+    // names for the code file and output file
+    wxString sourceFile = "temp.cpp";
+
+    #ifdef _WIN32
+        wxString outputFile = "temp_output.exe";
+    #else
+        wxString outputFile = "temp_output";
+    #endif
+
+
+    // save the code to source file
+
+    std::ofstream outFile(sourceFile.ToStdString()); // open the file for writing
+
+    if(!outFile)
+    {
+        wxMessageBox("Unable to open file for writing!","Error",wxICON_ERROR);
+        return;
+    }
+
+    outFile << code.ToStdString(); // write code to file
+    outFile.close(); // flush the buffer 
+
+
+    // Complie the file according to system
+
+    /* The 2> in the command is a shell redirection operator. In Unix-like systems (and in Windows command shells that support similar syntax), file descriptors are used to represent streams:
+
+       0 is for standard input (stdin).
+
+       1 is for standard output (stdout).
+
+       2 is for standard error (stderr)*/
+
+
+    #ifdef _WIN32
+        wxString compileCmd = "g++ temp.cpp -o temp_output.exe 2> compile_errors.txt";
+        wxString runCmd = "temp_output.exe";
+    #else 
+        wxString compileCmd = "g++ temp.cpp -o temp_output 2> compile_errors.txt";
+        wxString runCmd = "./temp_output";
+    #endif
+
+
+    // int system(const char *__command) => Execute the given line as a shell command
+    int compileResult = std::system(compileCmd.ToStdString().c_str());
+
+    if(compileResult == 0)
+    {
+        std::system(runCmd.ToStdString().c_str());
+
+        #ifdef _WIN32
+        wxString terminalCmd = "start cmd /k temp_output.exe";
+        #else
+        wxString terminalCmd = "gnome-terminal -- bash -c './temp_output; echo; echo Press enter to exit...; read'";
+        #endif
+
+        std::system(terminalCmd.ToStdString().c_str());
+    }
+
+
+    else
+    {
+        wxMessageBox("Compilation failed. Refer to compile_errors.txt for details.", "Build error", wxICON_ERROR);
+    }
+
 }
 
 
 void MainWindow::OnThemeDark(wxCommandEvent &)
 {
-    ApplyTheme(false); // false = light
+    ApplyTheme(true); // true = dark theme
 }
 
-
-void MainWindow::OnThemeLight(wxCommandEvent&)
+void MainWindow::OnThemeLight(wxCommandEvent &)
 {
-    ApplyTheme(true);
+    ApplyTheme(false); // false = light theme
 }
 
+void MainWindow::ApplyTheme(bool darkMode)
+{
+    wxMessageBox("Themes are available only for normal text editing! They break the code for code highlighting.", 
+        "Warning", 
+        wxOK|wxICON_INFORMATION);
+    
 
-void MainWindow::ApplyTheme(bool darkMode){
-
-    for(size_t i = 0; i < notebook->GetPageCount(); ++i)
+    for (size_t i = 0; i < notebook->GetPageCount(); ++i)
     {
-        // takes a ptr to a notebook page(a tab which is wxwindow* or textctrl*)
-        // and casts it to wxStyledTextCtrl* dynamically
+        // Get the i-th tab and dynamically cast to wxStyledTextCtrl*
         auto * editor = dynamic_cast<wxStyledTextCtrl*>(notebook->GetPage(i));
-
-        if(editor)
+        if (editor)
         {
-            if(darkMode){
-                // editor->StyleSetBackground(wxSTC_STYLE_DEFAULT,wxColour(30, 30, 30));
-                // editor->StyleSetForeground(wxSTC_STYLE_DEFAULT,wxColour(220, 220, 220));
+            if(darkMode)
+            {
+                // Set dark theme: dark background, light text
+                editor->StyleSetBackground(wxSTC_STYLE_DEFAULT, wxColour(30, 30, 30));
+                editor->StyleSetForeground(wxSTC_STYLE_DEFAULT, wxColour(220, 220, 220));
             }
-            else{
-                // editor->StyleSetBackground(wxSTC_STYLE_DEFAULT,*wxWHITE);
-                // editor->StyleSetForeground(wxSTC_STYLE_DEFAULT,*wxBLACK);
+            else
+            {
+                // Set light theme: white background, dark text
+                editor->StyleSetBackground(wxSTC_STYLE_DEFAULT, *wxWHITE);
+                editor->StyleSetForeground(wxSTC_STYLE_DEFAULT, *wxBLACK);
             }
 
-            // editor->Refresh();
+            // Reapply the style changes to all styles using the current default:
+            editor->StyleClearAll();
+            // Refresh so the changes take effect immediately:
+            editor->Refresh();
         }
     }
 }
