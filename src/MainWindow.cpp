@@ -92,6 +92,7 @@ void MainWindow::CreateStatusBarAndNotebook(){
 
     notebook = new wxAuiNotebook(this,wxID_ANY,wxDefaultPosition,wxDefaultSize,
         wxAUI_NB_DEFAULT_STYLE | wxAUI_NB_CLOSE_ON_ALL_TABS);
+    
 }
 
 
@@ -103,7 +104,13 @@ void MainWindow::AddNewTab(const wxString& title){
 
     // set margins to zero
     editor->SetMargins(0,0);
+
+    // set all margins to zero
     editor->SetMarginWidth(0,0);
+    editor->SetMarginWidth(1,0);
+    editor->SetMarginWidth(2,0);
+    editor->SetMarginWidth(3,0);
+    editor->SetMarginWidth(4,0);
 
 
     // background color 
