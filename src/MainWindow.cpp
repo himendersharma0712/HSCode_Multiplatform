@@ -13,7 +13,13 @@ enum {
     ID_Save,
     ID_BuildRun,
     ID_THEME_LIGHT,
-    ID_THEME_DARK
+    ID_THEME_DARK,
+    ID_New,
+    ID_Undo,
+    ID_Redo,
+    ID_Cut,
+    ID_Copy,
+    ID_Paste
 };
 
 
@@ -29,16 +35,30 @@ MainWindow::MainWindow(const wxString& title)
 
      SetStatusText("Welcome to HSCode!");
 
+    
+
 
      // dynamically connecting menu items to respective handlers
+
+     // File Menu event bindings
      Connect(ID_Open,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(MainWindow::OnOpen));
      Connect(ID_Save,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(MainWindow::OnSave));
      Connect(wxID_EXIT,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(MainWindow::OnExit));
      Connect(ID_BuildRun,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(MainWindow::OnBuildAndRun));
+     Connect(ID_New,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(MainWindow::OnNew));
 
-     // View Menu functions
+     // View Menu event bindings
      Connect(ID_THEME_DARK,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(MainWindow::OnThemeDark));
      Connect(ID_THEME_LIGHT,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(MainWindow::OnThemeLight));
+
+     // Edit Menu event bindings
+     Connect(ID_Undo,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(MainWindow::OnUndo));
+     Connect(ID_Redo,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(MainWindow::OnRedo));
+     Connect(ID_Cut,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(MainWindow::OnCut));
+     Connect(ID_Copy,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(MainWindow::OnCopy));
+     Connect(ID_Paste,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(MainWindow::OnPaste));
+     
+
 
 
 }
@@ -58,15 +78,28 @@ void MainWindow::CreateMenuBar(){
 
     // Adding menu items to File menu
 
-    fileMenu->Append(ID_Open,"&Open\tCtrl+O"); // Open button
-    fileMenu->Append(ID_Save,"&Save\tCtrl+S"); // Save button
-    fileMenu->Append(ID_BuildRun,"&Build and Run\tCtrl+Shift+B"); // Build and Run button 
+    fileMenu->Append(ID_New,"&New File\tCtrl+N"); // New file button 
+    fileMenu->Append(ID_Open,"&Open File\tCtrl+O"); // Open button
+    fileMenu->Append(ID_Save,"&Save File\tCtrl+S"); // Save button
+    fileMenu->Append(ID_BuildRun,"&Build and Run Current File\tCtrl+Shift+B"); // Build and Run button 
     fileMenu->AppendSeparator(); // horizontal line that separates items
-    fileMenu->Append(wxID_EXIT,"&Exit\tAlt+F4"); // Exit Button 
+    fileMenu->Append(wxID_EXIT,"&Exit\tCtrl+Q"); // Exit Button 
 
     // View Menu
     wxMenu * viewMenu = new wxMenu;
     wxMenu * themeMenu = new wxMenu;
+
+    // Edit Menu                    
+    wxMenu * editMenu = new wxMenu;
+
+    // Edit Menu items 
+    editMenu->Append(ID_Undo,"&Undo Action\tCtrl+Z");
+    editMenu->Append(ID_Redo,"&Redo Action\tCtrl+Y");
+    editMenu->AppendSeparator();
+    editMenu->Append(ID_Cut,"&Cut Selected\t\tCtrl+X");
+    editMenu->Append(ID_Copy,"&Copy Selected\t\tCtrl+C");
+    editMenu->Append(ID_Paste,"&Paste\t\tCtrl+V");
+
 
     // add radio buttons to theme menu
     themeMenu->AppendRadioItem(ID_THEME_DARK,"Dark");
@@ -78,6 +111,7 @@ void MainWindow::CreateMenuBar(){
 
     // Add File menu to MenuBar
     menuBar->Append(fileMenu,"&File");
+    menuBar->Append(editMenu,"&Edit");
     menuBar->Append(viewMenu,"&View");
     SetMenuBar(menuBar);
 }
@@ -391,5 +425,59 @@ void MainWindow::ApplyTheme(bool darkMode)
             // Refresh so the changes take effect immediately:
             editor->Refresh();
         }
+    }
+}
+
+
+
+void MainWindow::OnNew(wxCommandEvent & event)
+{
+    static int tabCount = 1;
+    wxString tabTitle = "Untitled " + std::to_string(tabCount++);
+    AddNewTab(tabTitle);
+}
+
+void MainWindow::OnUndo(wxCommandEvent &event)
+{
+    auto * editor = dynamic_cast<wxStyledTextCtrl*>(notebook->GetPage(notebook->GetSelection()));
+
+    if(editor){
+        editor->Undo();
+    }
+}
+
+void MainWindow::OnRedo(wxCommandEvent &event)
+{
+    auto * editor = dynamic_cast<wxStyledTextCtrl*>(notebook->GetPage(notebook->GetSelection()));
+
+    if(editor){
+        editor->Redo();
+    }
+}
+
+void MainWindow::OnCut(wxCommandEvent &event)
+{
+    auto * editor = dynamic_cast<wxStyledTextCtrl*>(notebook->GetPage(notebook->GetSelection()));
+
+    if(editor){
+        editor->Cut();
+    }
+}
+
+void MainWindow::OnCopy(wxCommandEvent &event)
+{
+    auto * editor = dynamic_cast<wxStyledTextCtrl*>(notebook->GetPage(notebook->GetSelection()));
+
+    if(editor){
+        editor->Copy();
+    }
+}
+
+void MainWindow::OnPaste(wxCommandEvent &event)
+{
+    auto * editor = dynamic_cast<wxStyledTextCtrl*>(notebook->GetPage(notebook->GetSelection()));
+
+    if(editor){
+        editor->Paste();
     }
 }

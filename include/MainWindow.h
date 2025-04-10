@@ -34,6 +34,7 @@ class MainWindow : public wxFrame
 
     // some functions like open, save, exit and "Build and Run"
 
+    void OnNew(wxCommandEvent & event);
     void OnOpen(wxCommandEvent & event);
     void OnSave(wxCommandEvent & event);
     void OnExit(wxCommandEvent & event);
@@ -42,6 +43,13 @@ class MainWindow : public wxFrame
     // view menu function declarations
     void OnThemeLight(wxCommandEvent& event);
     void OnThemeDark(wxCommandEvent& event);
+
+    // edit menu function declarations
+    void OnUndo(wxCommandEvent & event);
+    void OnRedo(wxCommandEvent & event);
+    void OnCut(wxCommandEvent & event);
+    void OnCopy(wxCommandEvent & event);
+    void OnPaste(wxCommandEvent & event);
 
     // apply theme
     void ApplyTheme(bool darkMode);
