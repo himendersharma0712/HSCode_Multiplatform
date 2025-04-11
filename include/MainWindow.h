@@ -14,9 +14,16 @@ class MainWindow : public wxFrame
 
     private:
 
+
+
     // Pointer to a tabbed notebook (each tab will have an editor)
     wxAuiNotebook * notebook;
 
+
+    // HomePage when >> all tabs are closed 
+    wxPanel* HomePage;
+    void CreateHomePage();
+    void UpdateHomePageVisibility();
 
     // UI Functions---->
 
@@ -63,7 +70,13 @@ class MainWindow : public wxFrame
     // Close Editor event
     void OnControl_WKeyDown(wxKeyEvent & event);
 
-    
+
+    // About
+    void OnAbout(wxCommandEvent & event);
+
+    // Get started
+    void OnGetStarted(wxCommandEvent & event);
+
 
 
 };

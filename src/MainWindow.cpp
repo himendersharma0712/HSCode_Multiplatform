@@ -6,6 +6,7 @@
 #include <sstream>
 
 
+#define HSCODE_VERSION "2.x.x"
 
 // unique ids for menu items 
 enum {
@@ -33,12 +34,16 @@ MainWindow::MainWindow(const wxString& title)
 
      CreateMenuBar(); // initializes menu bar
      CreateStatusBarAndNotebook(); // setup notebook(tabs) and status bar
-     AddNewTab();  // start with one blank tab
+
+    // open homepage
+     CreateHomePage();
+
+    //  AddNewTab();  // start with one blank tab
 
 
-     SetStatusText("Welcome to HSCode!");
+    SetStatusText("Welcome to HSCode!");
 
-    
+    UpdateHomePageVisibility();
 
 
      // dynamically connecting menu items to respective handlers
@@ -68,16 +73,70 @@ MainWindow::MainWindow(const wxString& title)
 
      // Close tab key down
      Connect(wxID_ANY,wxEVT_CHAR_HOOK,wxKeyEventHandler(MainWindow::OnControl_WKeyDown));
+
+     // About 
+     Connect(ID_About,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(MainWindow::OnAbout));
+
+     // Get Started
+     Connect(ID_Guide,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(MainWindow::OnGetStarted));
      
 
 
 
 }
 
+void MainWindow::CreateHomePage()
+{
+    // add a panel to notebook
+    HomePage = new wxPanel(notebook,wxID_ANY);
+    wxBoxSizer * homeSizer = new wxBoxSizer(wxVERTICAL); // sizer for layout
 
-void MainWindow::CreateMenuBar(){
+    wxStaticText* welcomeText = new wxStaticText(HomePage, wxID_ANY, "Welcome to HSCode Multiplatform", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
+    welcomeText->SetFont(wxFont(24, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
+    welcomeText->SetForegroundColour(*wxLIGHT_GREY);
 
-     // --- MENU BAR --- >
+    // wxStaticText* subTitle = new wxStaticText()
+
+    homeSizer->AddStretchSpacer();
+    homeSizer->Add(welcomeText,0,wxALIGN_TOP);
+    homeSizer->AddStretchSpacer();
+
+    HomePage->SetSizer(homeSizer);
+
+    notebook->AddPage(HomePage, "Welcome", false); // hidden title
+}
+
+void MainWindow::UpdateHomePageVisibility()
+{
+    int pageCount = notebook->GetPageCount();
+
+    if (pageCount == 1 && notebook->GetPage(0) == HomePage)
+    {
+        // Already showing void panel
+        return;
+    }
+
+    if (pageCount == 0)
+    {
+        // Add void panel back
+        notebook->AddPage(HomePage, "Welcome", false);
+        notebook->ChangeSelection(notebook->GetPageCount() - 1);
+    }
+    else
+    {
+        // If void panel is present along with others, remove it
+        int voidIndex = notebook->FindPage(HomePage);
+        if (voidIndex != wxNOT_FOUND)
+        {
+            notebook->RemovePage(voidIndex);
+        }
+    }
+}
+
+void MainWindow::CreateMenuBar()
+{
+
+    // --- MENU BAR --- >
 
     // menubar holds menus
     // menus hold menu items 
@@ -139,8 +198,6 @@ void MainWindow::CreateMenuBar(){
     menuBar->Append(helpMenu,"&Help");
     SetMenuBar(menuBar);
 }
-
-
 
 void MainWindow::CreateStatusBarAndNotebook(){
     // creates stock status bar 
@@ -240,6 +297,7 @@ void MainWindow::AddNewTab(const wxString& title){
 
     // Add it to the notebook with given title
     notebook->AddPage(editor,title,true);
+    UpdateHomePageVisibility();
 }
 
 
@@ -463,6 +521,7 @@ void MainWindow::CloseCurrentTab()
     if(selected != wxNOT_FOUND)
     {
         notebook->DeletePage(selected);
+        UpdateHomePageVisibility();
     }
 }
 
@@ -475,6 +534,17 @@ void MainWindow::OnControl_WKeyDown(wxKeyEvent &event)
     }
 
     event.Skip();
+}
+
+void MainWindow::OnAbout(wxCommandEvent &event)
+{
+    wxString about = "HSCode v" HSCODE_VERSION "\nA lightweight, multiplatform IDE.";
+    wxMessageBox(about, "About HSCode");
+}
+
+void MainWindow::OnGetStarted(wxCommandEvent &event)
+{
+    // TODO(Implement Get Started)
 }
 
 void MainWindow::OnNew(wxCommandEvent & event)
