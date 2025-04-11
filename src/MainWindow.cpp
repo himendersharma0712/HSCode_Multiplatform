@@ -19,7 +19,10 @@ enum {
     ID_Redo,
     ID_Cut,
     ID_Copy,
-    ID_Paste
+    ID_Paste,
+    ID_CloseEditor,
+    ID_About,
+    ID_Guide
 };
 
 
@@ -57,6 +60,14 @@ MainWindow::MainWindow(const wxString& title)
      Connect(ID_Cut,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(MainWindow::OnCut));
      Connect(ID_Copy,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(MainWindow::OnCopy));
      Connect(ID_Paste,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(MainWindow::OnPaste));
+
+
+     // Close tab menu event
+     Connect(ID_CloseEditor,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(MainWindow::CloseCurrentTab));
+     
+
+     // Close tab key down
+     Connect(wxID_ANY,wxEVT_CHAR_HOOK,wxKeyEventHandler(MainWindow::OnControl_WKeyDown));
      
 
 
@@ -81,8 +92,10 @@ void MainWindow::CreateMenuBar(){
     fileMenu->Append(ID_New,"&New File\tCtrl+N"); // New file button 
     fileMenu->Append(ID_Open,"&Open File\tCtrl+O"); // Open button
     fileMenu->Append(ID_Save,"&Save File\tCtrl+S"); // Save button
+    fileMenu->AppendSeparator();
     fileMenu->Append(ID_BuildRun,"&Build and Run Current File\tCtrl+Shift+B"); // Build and Run button 
     fileMenu->AppendSeparator(); // horizontal line that separates items
+    fileMenu->Append(ID_CloseEditor,"&Close Editor\tCtrl+W");
     fileMenu->Append(wxID_EXIT,"&Exit\tCtrl+Q"); // Exit Button 
 
     // View Menu
@@ -101,6 +114,16 @@ void MainWindow::CreateMenuBar(){
     editMenu->Append(ID_Paste,"&Paste\t\tCtrl+V");
 
 
+    // Help Menu
+    wxMenu * helpMenu = new wxMenu;
+
+    // Help Menu items
+    helpMenu->Append(ID_Guide,"&Get Started");
+    helpMenu->AppendSeparator();
+    helpMenu->Append(ID_About,"&About");
+    
+
+
     // add radio buttons to theme menu
     themeMenu->AppendRadioItem(ID_THEME_DARK,"Dark");
     themeMenu->AppendRadioItem(ID_THEME_LIGHT,"Light");
@@ -113,6 +136,7 @@ void MainWindow::CreateMenuBar(){
     menuBar->Append(fileMenu,"&File");
     menuBar->Append(editMenu,"&Edit");
     menuBar->Append(viewMenu,"&View");
+    menuBar->Append(helpMenu,"&Help");
     SetMenuBar(menuBar);
 }
 
@@ -428,7 +452,30 @@ void MainWindow::ApplyTheme(bool darkMode)
     }
 }
 
+void MainWindow::CloseCurrentTab(wxCommandEvent &event)
+{
+    CloseCurrentTab();
+}
 
+void MainWindow::CloseCurrentTab()
+{
+    int selected = notebook->GetSelection();
+    if(selected != wxNOT_FOUND)
+    {
+        notebook->DeletePage(selected);
+    }
+}
+
+void MainWindow::OnControl_WKeyDown(wxKeyEvent &event)
+{
+    if(event.GetKeyCode() == 'W' && event.ControlDown())
+    {
+        CloseCurrentTab();
+        return;
+    }
+
+    event.Skip();
+}
 
 void MainWindow::OnNew(wxCommandEvent & event)
 {

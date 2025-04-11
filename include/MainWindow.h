@@ -54,6 +54,15 @@ class MainWindow : public wxFrame
     // apply theme
     void ApplyTheme(bool darkMode);
 
+    // tabs or editors
+    void CloseCurrentTab(wxCommandEvent & event);
+
+    // to resolve conflicts
+    void CloseCurrentTab();
+
+    // Close Editor event
+    void OnControl_WKeyDown(wxKeyEvent & event);
+
     
 
 
