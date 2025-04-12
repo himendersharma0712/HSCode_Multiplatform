@@ -1,5 +1,5 @@
 # OOPS_Project
-*a GUI program built using wxWidgets*
+`a GUI program built using wxWidgets`
 
 
 HSCode IDE Development Log
