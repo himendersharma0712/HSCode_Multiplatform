@@ -1,113 +1,15 @@
 # OOPS_Project
-*a GUI program built using wxWidgets*
+`a GUI program built using wxWidgets`
 
 
-# HSCode IDE - Version 1.0.3 (WIP)
+HSCode IDE Development Log
+==========================
 
-Core Features Implemented:
+Date: 2025-04-12
 
-1. Main Window:
-
-wxFrame-based main window (MainWindow class).
-
-Window size set to 1400x900.
-
-
-
-2. Menu Bar:
-
-File Menu:
-
-Open (Ctrl+O)
-
-Save (Ctrl+S)
-
-Build and Run (Ctrl+Shift+B)
-
-Exit (Alt+F4)
-
-
-View Menu:
-
-Theme submenu with two radio items:
-
-Dark Theme
-
-Light Theme
-
-
-
-
-
-3. Status Bar and Notebook:
-
-Default status bar created.
-
-wxAuiNotebook used for managing editor tabs.
-
-Tabs support close buttons.
-
-
-
-4. Tab & Editor Management:
-
-Each tab contains a wxStyledTextCtrl as the code editor.
-
-Editor uses C++ lexer and syntax highlighting.
-
-Keywords, comments, numbers, strings, operators, and preprocessors are color-coded.
-
-Fonts and colors are customizable.
-
-
-
-5. File Operations:
-
-Open:
-
-Displays a file dialog.
-
-Opens .cpp, .h, or any file.
-
-Loads content into a new tab.
-
-
-Save:
-
-Displays save file dialog.
-
-Saves current tab's content.
-
-Updates tab title to filename.
-
-
-
-
-6. Build and Run:
-
-Currently shows a message box saying "under development".
-
-
-
-7. Theme Support (Partially Implemented):
-
-Theme switching via ApplyTheme(bool darkMode) method.
-
-Uses StyleSetBackground and StyleSetForeground.
-
-However, currently commented out (temporarily inactive as of latest update).
-
-
-
-
-Notes:
-
-Theme switching buttons exist but are non-functional until re-enabled.
-
-Syntax highlighting, tab system, and file I/O are all functional.
-
-Build system and advanced editing features to be added in future versions.
-
+Summary:
+--------
+This document tracks the development of the HSCode IDE, focusing on integrating build and run functionality for both Windows and Linux platforms, syntax highlighting, editor customization, and user interface enhancements using wxWidgets and wxStyledTextCtrl.
 
 Progress Log:
 -------------
@@ -128,11 +30,33 @@ Progress Log:
 3. Handled runtime terminal issues:
    - On Linux Mint Cinnamon, used `x-terminal-emulator -e ./temp_output` to launch the output in a new terminal window.
    - Verified functionality on Linux.
-   - Preparing for testing on Windows, expecting slower builds due to antivirus and filesystem overhead.
+   - Testing confirmed working execution behavior across platforms.
 
-Add settings and tab persistence.
+4. UI Enhancements:
+   - Added edit menu with full functionality (cut, copy, paste, undo, redo).
+   - Added "New File" and "Close Tab" functionality.
+   - Implemented keyboard shortcut for closing tabs (Ctrl+W) using key event handling.
+   - Introduced static counter for untitled files.
+   - Developed homepage panel (formerly "void panel") to display when no tabs are open.
 
-Improve UI with custom icons or layouts.
+5. General Improvements:
+   - Menu bar and status bar fully implemented.
+   - Working tab system with the ability to add new editors dynamically.
+   - Display versioning and future placeholder for about info.
+   - Verified and minimized app size (598 KB binary).
+   
+Next Steps:
+-----------
+- Implement a sidebar for file directory navigation with toggle visibility button in the status bar.
+- Refine execution handling on Windows.
+- Provide clear compiler error output to users via interface.
+- Clean temp files post execution.
+- Polish UI/UX with icon, logo, theme switching, and optional Gemini API integration.
+
+Notes:
+------
+- Redirection `2>` used to capture compile-time errors.
+- Execution method uses `std::system()` for shell commands.
+- IDE functions as a lightweight and fast C++ development environment.
 
 
-End of HSCode IDE v1.0.3 documentation.
