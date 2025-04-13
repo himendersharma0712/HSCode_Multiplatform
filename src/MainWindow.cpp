@@ -23,7 +23,8 @@ enum {
     ID_Paste,
     ID_CloseEditor,
     ID_About,
-    ID_Guide
+    ID_Guide,
+    ID_ToggleSideBar
 };
 
 
@@ -39,9 +40,6 @@ MainWindow::MainWindow(const wxString& title)
      CreateHomePage();
 
     //  AddNewTab();  // start with one blank tab
-
-
-    SetStatusText("Welcome to HSCode!");
 
     UpdateHomePageVisibility();
 
@@ -201,7 +199,21 @@ void MainWindow::CreateMenuBar()
 
 void MainWindow::CreateStatusBarAndNotebook(){
     // creates stock status bar 
-    CreateStatusBar(); 
+    statusBar = CreateStatusBar(); 
+
+    // horizontal sizer
+    wxBoxSizer * statusBarSizer = new wxBoxSizer(wxHORIZONTAL);
+
+    // // Static text (welcome message)
+    // wxStaticText * welcomeText = new wxStaticText(statusBar,wxID_ANY,"Welcome to HSCode",wxDefaultPosition,wxSize(120,25));
+    // statusBarSizer->Add(welcomeText,1,wxALIGN_CENTER|wxALL,5);
+
+    // toggle sidebar button
+    wxButton * toggleSidebarButton = new wxButton(statusBar,ID_ToggleSideBar,"Show/Hide Sidebar",wxPoint(5,2),wxSize(150,25));
+    statusBarSizer->Add(toggleSidebarButton,0,wxALIGN_LEFT,5);
+
+    // set the sizer 
+    statusBar->SetSizer(statusBarSizer);
 
     // notebook with close button 
 

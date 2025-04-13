@@ -15,6 +15,8 @@ class MainWindow : public wxFrame
     private:
 
 
+    // status bar 
+    wxStatusBar * statusBar;
 
     // Pointer to a tabbed notebook (each tab will have an editor)
     wxAuiNotebook * notebook;
